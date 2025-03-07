@@ -1,1 +1,6 @@
-
+Post Title 1
+This is the first blog post content.
+---
+Post Title 2
+Another blog post content.
+---
