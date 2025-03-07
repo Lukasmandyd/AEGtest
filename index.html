@@ -9,36 +9,53 @@
 <body>
     <header>
         <h1>Welcome to AEG Esports</h1>
-        <p>Balls hahahhahahahahhahahahahahahahahhahhahahahahahhahahahahhahhaah !</p>
+        <p>Your premier destination for esports tournaments, community, and more!</p>
     </header>
 
     <main>
         <div class="button-container">
             <a href="about.html">
-                <img src="images/home-button.jpg" alt="Home" class="img-btn">
+                <img src="images/home-button.png" alt="Home" class="img-btn">
             </a>
             <a href="about.html">
-                <img src="images/about-button.jpg" alt="About Us" class="img-btn">
+                <img src="images/about-button.png" alt="About Us" class="img-btn">
             </a>
             <a href="tournaments.html">
-                <img src="images/tournaments-button.jpg" alt="Tournaments" class="img-btn">
+                <img src="images/tournaments-button.png" alt="Tournaments" class="img-btn">
             </a>
             <a href="community.html">
-                <img src="images/community-button.jpg" alt="Community" class="img-btn">
+                <img src="images/community-button.png" alt="Community" class="img-btn">
             </a>
             <a href="content.html">
-                <img src="images/content-button.jpg" alt="Content Hub" class="img-btn">
+                <img src="images/content-button.png" alt="Content Hub" class="img-btn">
             </a>
             <a href="merchandise.html">
-                <img src="images/merchandise-button.jpg" alt="Merchandise" class="img-btn">
+                <img src="images/merchandise-button.png" alt="Merchandise" class="img-btn">
             </a>
             <a href="sponsors.html">
-                <img src="images/sponsors-button.jpg" alt="Sponsorship" class="img-btn">
+                <img src="images/sponsors-button.png" alt="Sponsorship" class="img-btn">
             </a>
             <a href="contact.html">
-                <img src="images/contact-button.jpg" alt="Contact" class="img-btn">
+                <img src="images/contact-button.png" alt="Contact" class="img-btn">
             </a>
         </div>
+
+        <!-- Blog Section -->
+        <section class="blog-section">
+            <h2>Latest Blog Posts</h2>
+            <div id="blog-posts">
+                <!-- Blog posts will be loaded here -->
+            </div>
+
+            <!-- Admin Blog Post Form -->
+            <h3>Add a Blog Post</h3>
+            <input type="password" id="admin-password" placeholder="Enter Admin Password">
+            <input type="text" id="blog-title" placeholder="Blog Title">
+            <textarea id="blog-content" placeholder="Write your blog post here..."></textarea>
+            <button onclick="addBlogPost()">Submit Post</button>
+        </section>
     </main>
+
+    <script src="script.js"></script>
 </body>
 </html>
