@@ -27,9 +27,10 @@ function logout() {
     window.location.href = "index.html";
 }
 
-// Load blog posts using the PHP proxy to bypass CORS
+// Load blog posts from the raw GitHub URL
 function loadBlogPosts() {
-    fetch("https://cors-anywhere.herokuapp.com/https://aegphp.free.nf/blog.php") // Using PHP proxy instead of direct .txt file
+    // Use the raw GitHub URL for blog.txt
+    fetch("https://raw.githubusercontent.com/Lukasmandyd/AEGtest/main/blog.txt")
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -39,11 +40,11 @@ function loadBlogPosts() {
         .then(data => {
             let blogContainer = document.getElementById("blog-posts");
             if (blogContainer) {
-                blogContainer.innerHTML = "";
-                let posts = data.split("\n---\n");
+                blogContainer.innerHTML = ""; // Clear current content
+                let posts = data.split("\n---\n"); // Split by post delimiter
                 posts.forEach(post => {
                     if (post.trim()) {
-                        let [title, content] = post.split("\n", 2);
+                        let [title, content] = post.split("\n", 2); // Get title and content
                         blogContainer.innerHTML += `<div class="blog-post">
                             <h3>${title}</h3>
                             <p>${content}</p>
