@@ -6,3 +6,6 @@ rftghjk
 Your new blog content goes here!
 ---
 Your new blog content goes here!
+---
+niga
+---
