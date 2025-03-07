@@ -29,7 +29,7 @@ function logout() {
 
 // Load blog posts
 function loadBlogPosts() {
-    fetch("blog.txt")
+    fetch("https://AegPhp.free.nf/blog.txt") // Fetch blog posts from the InfinityFree server
         .then(response => response.text())
         .then(data => {
             let blogContainer = document.getElementById("blog-posts");
@@ -60,7 +60,7 @@ function addBlogPost() {
         return;
     }
 
-    fetch("save_post.php", {
+    fetch("https://AegPhp.free.nf/save_post.php", {  // Updated URL to InfinityFree server
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`
@@ -68,9 +68,9 @@ function addBlogPost() {
     .then(response => response.text())
     .then(data => {
         alert(data);
-        document.getElementById("blog-title").value = "";
+        document.getElementById("blog-title").value = ""; // Clear input fields
         document.getElementById("blog-content").value = "";
-        loadBlogPosts();
+        loadBlogPosts(); // Reload blog posts
     })
     .catch(error => console.error("Error saving blog post:", error));
 }
