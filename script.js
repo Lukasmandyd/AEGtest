@@ -1,7 +1,7 @@
 const PASSWORD = "Blogadmin123"; // Admin password
 
 // Wait for the DOM to load
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     // Attach event listener to the Admin button
     let adminBtn = document.getElementById("admin-btn");
     if (adminBtn) {
@@ -27,10 +27,15 @@ function logout() {
     window.location.href = "index.html";
 }
 
-// Load blog posts
+// Load blog posts using the PHP proxy to bypass CORS
 function loadBlogPosts() {
-    fetch("https://AegPhp.free.nf/blog.txt")  // Updated to HTTPS
-        .then(response => response.text())
+    fetch("https://aegphp.free.nf/blog.php") // Using PHP proxy instead of direct .txt file
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(data => {
             let blogContainer = document.getElementById("blog-posts");
             if (blogContainer) {
@@ -50,7 +55,7 @@ function loadBlogPosts() {
         .catch(error => console.error("Error loading blog posts:", error));
 }
 
-// Save new blog post using PHP backend
+// Save new blog post using PHP backend with CORS support
 function addBlogPost() {
     let title = document.getElementById("blog-title").value.trim();
     let content = document.getElementById("blog-content").value.trim();
@@ -60,17 +65,22 @@ function addBlogPost() {
         return;
     }
 
-    fetch("https://AegPhp.free.nf/save_post.php", {  // Updated to HTTPS
+    fetch("https://aegphp.free.nf/save_post.php", { // Ensure save_post.php has CORS enabled
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`
     })
-    .then(response => response.text())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.text();
+    })
     .then(data => {
         alert(data);
-        document.getElementById("blog-title").value = "";
+        document.getElementById("blog-title").value = ""; // Clear input fields
         document.getElementById("blog-content").value = "";
-        loadBlogPosts();
+        loadBlogPosts(); // Reload blog posts
     })
     .catch(error => console.error("Error saving blog post:", error));
 }
