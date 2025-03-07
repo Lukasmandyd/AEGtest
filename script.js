@@ -1,10 +1,22 @@
 const PASSWORD = "Blogadmin123"; // Admin password
 
+// Wait for the DOM to load
+document.addEventListener("DOMContentLoaded", function() {
+    // Attach event listener to the Admin button
+    let adminBtn = document.getElementById("admin-btn");
+    if (adminBtn) {
+        adminBtn.addEventListener("click", accessAdmin);
+    }
+
+    // Load blog posts when the page loads
+    loadBlogPosts();
+});
+
 // Redirect to admin page if password is correct
 function accessAdmin() {
     let enteredPassword = prompt("Enter Admin Password:");
     if (enteredPassword === PASSWORD) {
-        window.location.href = "admin.html";
+        window.location.href = "admin.html"; // Redirects to the admin panel
     } else {
         alert("Incorrect password!");
     }
@@ -16,8 +28,6 @@ function logout() {
 }
 
 // Load blog posts
-document.addEventListener("DOMContentLoaded", loadBlogPosts);
-
 function loadBlogPosts() {
     fetch("blog.txt")
         .then(response => response.text())
