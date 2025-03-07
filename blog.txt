@@ -4,3 +4,5 @@ This is the first blog post content.
 Post Title 2
 Another blog post content.
 ---
+
+New Blog Post: This is the updated content.
