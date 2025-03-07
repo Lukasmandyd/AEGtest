@@ -29,7 +29,7 @@ function logout() {
 
 // Load blog posts using the PHP proxy to bypass CORS
 function loadBlogPosts() {
-    fetch("https://aegphp.free.nf/blog.php") // Using PHP proxy instead of direct .txt file
+    fetch("https://cors-anywhere.herokuapp.com/https://aegphp.free.nf/blog.php") // Using PHP proxy instead of direct .txt file
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -65,7 +65,7 @@ function addBlogPost() {
         return;
     }
 
-    fetch("https://aegphp.free.nf/save_post.php", { // Ensure save_post.php has CORS enabled
+    fetch("https://cors-anywhere.herokuapp.com/https://aegphp.free.nf/save_post.php", { // Ensure save_post.php has CORS enabled
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`
