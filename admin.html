@@ -4,154 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .blog-post { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
-        img { max-width: 100%; height: auto; }
-    </style>
 </head>
 <body>
-    <h2>Post a New Blog</h2>
-    <input type="text" id="blog-title" placeholder="Title"><br><br>
-    <textarea id="blog-content" placeholder="Write your post..." rows="5"></textarea><br><br>
-    <input type="file" id="blog-image" accept="image/*"><br><br>
-    <button onclick="addBlogPost()">Submit Blog</button>
+    <h2>Admin Panel - Add Blog Post</h2>
+    
+    <input type="text" id="blog-title" placeholder="Blog Title">
+    <textarea id="blog-content" placeholder="Blog Content"></textarea>
+    <button onclick="addBlogPost()">Post Blog</button>
 
-    <h2>Blog Posts</h2>
-    <div id="blog-posts">Loading...</div>
+    <h2>Existing Blog Posts</h2>
+    <div id="blog-posts"></div>
 
     <script>
-        const GITHUB_USERNAME = "Lukasmandyd";  // Your GitHub username
-        const GITHUB_REPO = "AEGtest";          // Your GitHub repo
-        const GITHUB_TOKEN = "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"; // Replace with your GitHub token
-        const BLOG_FILE = "blog.txt";  // File to store blog posts
-        const IMAGE_FOLDER = "images/"; // Folder to upload images
+        const REPO = "Lukasmandyd/AEGtest"; // GitHub repo
+        const FILE_PATH = "blog.txt"; // Blog file path
 
-        // Function to upload an image to GitHub
-        async function uploadImage(imageFile) {
-            const reader = new FileReader();
-            reader.readAsDataURL(imageFile);
-
-            return new Promise((resolve, reject) => {
-                reader.onload = async () => {
-                    let base64Image = reader.result.split(',')[1];  // Get base64 content
-                    let imageName = IMAGE_FOLDER + imageFile.name;
-
-                    let response = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${imageName}`, {
-                        method: "PUT",
-                        headers: {
-                            "Authorization": `token ${GITHUB_TOKEN}`,
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            message: "Uploaded new blog image",
-                            content: base64Image
-                        })
+        // Load and display blog posts
+        function loadBlogPosts() {
+            fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`)
+                .then(response => response.json())
+                .then(data => {
+                    let content = atob(data.content); // Decode base64
+                    let posts = content.split("\n---\n").reverse(); // Show newest first
+                    let blogContainer = document.getElementById("blog-posts");
+                    blogContainer.innerHTML = "";
+                    
+                    posts.forEach(post => {
+                        if (post.trim()) {
+                            let [title, ...body] = post.split("\n");
+                            blogContainer.innerHTML += `
+                                <div class="blog-post">
+                                    <h3>${title}</h3>
+                                    <p>${body.join("\n")}</p>
+                                </div>`;
+                        }
                     });
-
-                    let data = await response.json();
-                    if (response.ok) {
-                        resolve(data.content.download_url);
-                    } else {
-                        reject(data);
-                    }
-                };
-            });
+                })
+                .catch(error => console.error("Error loading blog posts:", error));
         }
 
-        // Function to add a blog post to GitHub
+        // Add a new blog post
         async function addBlogPost() {
             let title = document.getElementById("blog-title").value.trim();
             let content = document.getElementById("blog-content").value.trim();
-            let imageFile = document.getElementById("blog-image").files[0];
 
             if (!title || !content) {
-                alert("Please enter a title and content.");
+                alert("Please enter a title and content!");
                 return;
             }
 
-            let imageUrl = "";
-            if (imageFile) {
-                try {
-                    imageUrl = await uploadImage(imageFile);
-                } catch (error) {
-                    console.error("Image upload failed", error);
-                    alert("Image upload failed!");
-                    return;
-                }
-            }
-
-            // Get existing blog content
-            let response = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${BLOG_FILE}`, {
-                headers: { "Authorization": `token ${GITHUB_TOKEN}` }
-            });
+            let newPost = `\n---\n${title}\n${content}`;
+            
+            // Fetch current content
+            let response = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`);
             let data = await response.json();
-            let currentContent = response.ok ? atob(data.content) : "";
+            let oldContent = atob(data.content); // Decode base64
 
-            // Format the new blog post
-            let newPost = `\n---\nTitle: ${title}\nContent: ${content}\n`;
-            if (imageUrl) newPost += `Image: ${imageUrl}\n`;
-            newPost += "---\n";
+            // Append new post at the **TOP**
+            let updatedContent = btoa(newPost + oldContent); // Encode base64
 
-            let updatedContent = currentContent + newPost;  // Append the new post
-
-            // Upload the updated blog file
-            let updateResponse = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${BLOG_FILE}`, {
+            // Update the file
+            fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
                 method: "PUT",
-                headers: { "Authorization": `token ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "token YOUR_GITHUB_TOKEN" // **Replace this if private repo**
+                },
                 body: JSON.stringify({
-                    message: "Updated blog",
-                    content: btoa(updatedContent),
-                    sha: data.sha  // Required to update an existing file
+                    message: "New blog post added",
+                    content: updatedContent,
+                    sha: data.sha // Required to update file
                 })
-            });
-
-            if (updateResponse.ok) {
-                alert("Blog post added successfully!");
-                document.getElementById("blog-title").value = "";
-                document.getElementById("blog-content").value = "";
-                document.getElementById("blog-image").value = "";
-                loadBlogPosts();  // Reload the blog posts
-            } else {
-                alert("Failed to update blog!");
-            }
+            })
+            .then(response => response.json())
+            .then(() => {
+                alert("Blog post added!");
+                loadBlogPosts(); // Reload posts
+            })
+            .catch(error => console.error("Failed to update blog:", error));
         }
 
-        // Load blog posts from GitHub
-        async function loadBlogPosts() {
-            let response = await fetch(`https://raw.githubusercontent.com/${GITHUB_USERNAME}/${GITHUB_REPO}/main/${BLOG_FILE}`);
-            if (!response.ok) {
-                console.error("Failed to load blog posts.");
-                return;
-            }
-
-            let text = await response.text();
-            let blogContainer = document.getElementById("blog-posts");
-            blogContainer.innerHTML = "";
-
-            let posts = text.split("\n---\n").filter(post => post.trim()).reverse(); // Newest first
-
-            posts.forEach(post => {
-                let titleMatch = post.match(/Title: (.+)/);
-                let contentMatch = post.match(/Content: (.+)/s);
-                let imageMatch = post.match(/Image: (.+)/);
-
-                let title = titleMatch ? titleMatch[1] : "Untitled";
-                let content = contentMatch ? contentMatch[1] : "No content";
-                let imageUrl = imageMatch ? imageMatch[1] : "";
-
-                let postHTML = `<div class="blog-post">
-                    <h3>${title}</h3>
-                    <p>${content}</p>`;
-                if (imageUrl) postHTML += `<img src="${imageUrl}" style="max-width:100%;height:auto;">`;
-                postHTML += `</div>`;
-
-                blogContainer.innerHTML += postHTML;
-            });
-        }
-
-        // Run the function on page load
-        document.addEventListener("DOMContentLoaded", loadBlogPosts);
+        // Load posts on page load
+        loadBlogPosts();
     </script>
 </body>
 </html>
